@@ -1,0 +1,42 @@
+.add-task-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-task-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #333;
+  }
+  
+  .add-task-container input,
+  .add-task-container textarea,
+  .add-task-container select,
+  .add-task-container label {
+    width: 100%;
+    margin-bottom: 15px;
+    display: block;
+  }
+  
+  .add-task-container input,
+  .add-task-container textarea,
+  .add-task-container select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .add-task-container button {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  
+  }
+  

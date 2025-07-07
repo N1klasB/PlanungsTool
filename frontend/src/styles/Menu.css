@@ -1,0 +1,25 @@
+  .menu-heading h1{
+    text-align: center;
+    padding: 25px;
+  }
+  
+  .menu-buttons {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    list-style: none;
+    padding: none;
+  }
+  
+  .menu-buttons li a {
+    text-decoration: none;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .menu-buttons li a:hover {
+    background-color: #0056b3;
+  }
