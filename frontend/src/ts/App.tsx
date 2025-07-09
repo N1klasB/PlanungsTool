@@ -38,13 +38,13 @@ const App: React.FC = () => {
 
   const saveToBackend = async () => {
     const payload = {
-      id: sessionId,
+      sessionId: sessionId,
       tasks,
       projects,
     };
 
     const response = await fetch(
-      "https://aeou4xx5dg.execute-api.eu-central-1.amazonaws.com/prod/save",
+      "https://vvg2f72ym9.execute-api.eu-central-1.amazonaws.com/prod/save",
       {
         method: "POST",
         headers: {
@@ -61,7 +61,7 @@ const App: React.FC = () => {
 
   const loadFromBackend = async () => {
     const response = await fetch(
-      "https://aeou4xx5dg.execute-api.eu-central-1.amazonaws.com/prod/load?id=" +
+      "https://vvg2f72ym9.execute-api.eu-central-1.amazonaws.com/prod/load?sessionId=" +
         sessionId,
       {
         headers: {
@@ -81,6 +81,8 @@ const App: React.FC = () => {
     if (customSessionId.trim()) {
       setSessionId(customSessionId.trim());
       setCustomSessionId("");
+      setTasks([]);
+      setProjects([]);
     }
   };
 

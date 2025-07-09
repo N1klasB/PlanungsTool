@@ -10,7 +10,8 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
 
     const table = new dynamodb.Table(this, "NiBehTable", {
       tableName: "NiBehTable",
-      partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
+      partitionKey: { name: "sessionId", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "id", type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
