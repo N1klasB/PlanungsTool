@@ -62,7 +62,6 @@ const App: React.FC = () => {
     }
 
     const payload = {
-      // sessionId fällt weg, Backend nutzt username aus Token
       tasks,
       projects,
     };
@@ -84,9 +83,9 @@ const App: React.FC = () => {
   };
 
   const loadFromBackend = async () => {
-    const accessToken = getIdToken();
-    if (!accessToken) {
-      alert("Nicht eingeloggt.");
+    const idToken = getIdToken();
+    if (!idToken) {
+      alert("Not logged in.");
       return;
     }
 
@@ -96,7 +95,7 @@ const App: React.FC = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${idToken}`,
         },
       }
     );

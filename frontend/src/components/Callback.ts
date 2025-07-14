@@ -16,7 +16,7 @@ const Callback = () => {
       localStorage.setItem("id_token", idToken ?? "");
     }
 
-    const fetchData = async () => {
+    const loadData = async () => {
       try {
         const response = await fetch(
           "https://vvg2f72ym9.execute-api.eu-central-1.amazonaws.com/prod/load",
@@ -41,7 +41,7 @@ const Callback = () => {
     };
 
     if (idToken) {
-      fetchData();
+      loadData();
     }
 
     navigate("/Menu");
