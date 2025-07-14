@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Link,
-  Navigate,
 } from "react-router-dom";
 import { Task } from "../models/task";
 import { Project } from "../models/project";
@@ -16,13 +15,32 @@ import AddTask from "../components/AddTask.tsx";
 import AddProject from "../components/AddProject.tsx";
 import ProjectItem from "../components/ProjectItem.tsx";
 import Dashboard from "../components/Dashboard.tsx";
-import { generateId } from "../services/idGenerator.ts";
+import Callback from "../components/Callback.ts";
+import LoginRedirect from "../components/Redirect.ts";
+
+const getUsernameFromToken = (): string | null => {
+  const token = localStorage.getItem("id_token") || "";
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload["cognito:username"] || null;
+  } catch {
+    return null;
+  }
+};
+
+const getIdToken = (): string | null => {
+  return localStorage.getItem("id_token") || null;
+};
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [sessionId, setSessionId] = useState<string>(generateId());
-  const [customSessionId, setCustomSessionId] = useState<string>("");
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUsername(getUsernameFromToken());
+  }, []);
 
   const handleDeleteTask = (id: string) => {
     setTasks(deleteTask(tasks, id));
@@ -37,8 +55,14 @@ const App: React.FC = () => {
   };
 
   const saveToBackend = async () => {
+    const idToken = getIdToken();
+    if (!idToken) {
+      alert("Not logged in.");
+      return;
+    }
+
     const payload = {
-      sessionId: sessionId,
+      // sessionId fällt weg, Backend nutzt username aus Token
       tasks,
       projects,
     };
@@ -49,7 +73,7 @@ const App: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": "nx32kkfsrdx92hajd83lqw",
+          Authorization: `Bearer ${idToken}`,
         },
         body: JSON.stringify(payload),
       }
@@ -60,13 +84,19 @@ const App: React.FC = () => {
   };
 
   const loadFromBackend = async () => {
+    const accessToken = getIdToken();
+    if (!accessToken) {
+      alert("Nicht eingeloggt.");
+      return;
+    }
+
     const response = await fetch(
-      "https://vvg2f72ym9.execute-api.eu-central-1.amazonaws.com/prod/load?sessionId=" +
-        sessionId,
+      "https://vvg2f72ym9.execute-api.eu-central-1.amazonaws.com/prod/load",
       {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": "nx32kkfsrdx92hajd83lqw",
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
@@ -75,15 +105,6 @@ const App: React.FC = () => {
     if (data.tasks) setTasks(data.tasks);
     if (data.projects) setProjects(data.projects);
     alert(data.message);
-  };
-
-  const handleSessionId = () => {
-    if (customSessionId.trim()) {
-      setSessionId(customSessionId.trim());
-      setCustomSessionId("");
-      setTasks([]);
-      setProjects([]);
-    }
   };
 
   const completedTasks = tasks.filter((task) => task.taskStatus);
@@ -109,6 +130,11 @@ const App: React.FC = () => {
               <Link to="/Menu">Menu</Link>
             </li>
             <li>
+              <a href="https://ni-beh-app-login.auth.eu-central-1.amazoncognito.com/login?response_type=token&client_id=49fmlkpn2urofbnebokhvvmb02&redirect_uri=http://localhost:3000/callback">
+                Login
+              </a>
+            </li>
+            <li>
               <Link to="/Dashboard">Dashboard</Link>
             </li>
             <li>
@@ -123,7 +149,6 @@ const App: React.FC = () => {
             <li>
               <Link to="/projects">Project-Overview</Link>
             </li>
-
             <li
               style={{
                 marginLeft: "auto",
@@ -132,21 +157,15 @@ const App: React.FC = () => {
                 gap: "0.5rem",
               }}
             >
-              <input
-                type="text"
-                placeholder="Session ID setzen"
-                value={customSessionId}
-                onChange={(e) => setCustomSessionId(e.target.value)}
-              />
-              <button onClick={handleSessionId}>Set</button>
+              {username ? `Logged in as: ${username}` : "Not logged in"}
               <button onClick={saveToBackend}>Save</button>
               <button onClick={loadFromBackend}>Load</button>
-              {sessionId}
             </li>
           </ul>
         </nav>
         <Routes>
-          <Route path="/" element={<Navigate to="/Menu" />} />
+          <Route path="/callback" element={<Callback />} />
+          <Route path="/" element={<LoginRedirect />} />
           <Route
             path="/Menu"
             element={

@@ -5,6 +5,8 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "amazon-cognito-identity-js": "^6.3.15",
+    "aws-amplify": "^6.15.3",
     "cra-template-typescript": "1.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

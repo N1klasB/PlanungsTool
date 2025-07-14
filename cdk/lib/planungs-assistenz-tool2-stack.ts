@@ -3,11 +3,16 @@ import { Construct } from "constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigw from "aws-cdk-lib/aws-apigateway";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 
 export class PlanungsAssistenzTool2Stack extends cdk.Stack {
+  public readonly userPool: cognito.UserPool;
+  public readonly userPoolClient: cognito.UserPoolClient;
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    // DynamoDB Table
     const table = new dynamodb.Table(this, "NiBehTable", {
       tableName: "NiBehTable",
       partitionKey: { name: "sessionId", type: dynamodb.AttributeType.STRING },
@@ -16,6 +21,7 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    // Lambda Functions
     const loadLambda = new lambda.Function(this, "NiBehReadLambda", {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: "load.handler",
@@ -37,66 +43,87 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
     table.grantReadData(loadLambda);
     table.grantWriteData(saveLambda);
 
+    // Cognito User Pool
+    this.userPool = new cognito.UserPool(this, "NiBehUserPool", {
+      selfSignUpEnabled: false,
+      signInAliases: {
+        username: true,
+      },
+      autoVerify: {},
+    });
+
+    this.userPoolClient = new cognito.UserPoolClient(
+      this,
+      "NiBehUserPoolClient",
+      {
+        userPool: this.userPool,
+        generateSecret: false,
+        authFlows: {
+          userSrp: true,
+        },
+        oAuth: {
+          callbackUrls: ["http://localhost:3000/callback"],
+          logoutUrls: ["http://localhost:3000/logout"], //noch nicht in use
+          flows: {
+            implicitCodeGrant: true,
+          },
+          scopes: [cognito.OAuthScope.OPENID],
+        },
+      }
+    );
+
+    new cognito.CfnUserPoolDomain(this, "NiBehUserPoolDomain", {
+      domain: "ni-beh-app-login",
+      userPoolId: this.userPool.userPoolId,
+    });
+
+    // API Gateway
     const restApi = new apigw.RestApi(this, "NiBehApi", {
       restApiName: "NiBehRestApi",
       deployOptions: {
         stageName: "prod",
       },
-    });
-
-    const apiKey = restApi.addApiKey("NiBehApiKey", {
-      value: "nx32kkfsrdx92hajd83lqw",
-    });
-
-    const plan = restApi.addUsagePlan("NiBehUsagePlan", {
-      name: "NiBehUsagePlan",
-      throttle: {
-        rateLimit: 10,
-        burstLimit: 2,
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigw.Cors.ALL_ORIGINS,
+        allowMethods: apigw.Cors.ALL_METHODS,
+        allowHeaders: ["Content-Type", "Authorization"],
       },
     });
 
-    plan.addApiKey(apiKey);
-    plan.addApiStage({
-      stage: restApi.deploymentStage,
-    });
+    //Authorizer
+    const authorizer = new apigw.CognitoUserPoolsAuthorizer(
+      this,
+      "NiBehAuthorizer",
+      {
+        cognitoUserPools: [this.userPool],
+      }
+    );
 
-    const loadIntegration = new apigw.LambdaIntegration(loadLambda);
+    // GET /load Endpoint
     const load = restApi.root.addResource("load");
-    load.addCorsPreflight({
-      allowOrigins: apigw.Cors.ALL_ORIGINS,
-      allowMethods: ["GET"],
-      allowHeaders: [
-        "Content-Type",
-        "X-Amz-Date",
-        "Authorization",
-        "X-Api-Key",
-      ],
+    load.addMethod("GET", new apigw.LambdaIntegration(loadLambda), {
+      authorizer,
+      authorizationType: apigw.AuthorizationType.COGNITO,
     });
 
-    load.addMethod("GET", loadIntegration, {
-      apiKeyRequired: true,
-    });
-
-    const saveIntegration = new apigw.LambdaIntegration(saveLambda);
+    // POST /save Endpoint
     const save = restApi.root.addResource("save");
-    save.addCorsPreflight({
-      allowOrigins: apigw.Cors.ALL_ORIGINS,
-      allowMethods: ["POST"],
-      allowHeaders: [
-        "Content-Type",
-        "X-Amz-Date",
-        "Authorization",
-        "X-Api-Key",
-      ],
+    save.addMethod("POST", new apigw.LambdaIntegration(saveLambda), {
+      authorizer,
+      authorizationType: apigw.AuthorizationType.COGNITO,
     });
 
-    save.addMethod("POST", saveIntegration, {
-      apiKeyRequired: true,
-    });
-
+    // CloudFormation Outputs
     new cdk.CfnOutput(this, "ApiUrl", {
       value: restApi.url,
+    });
+
+    new cdk.CfnOutput(this, "UserPoolId", {
+      value: this.userPool.userPoolId,
+    });
+
+    new cdk.CfnOutput(this, "UserPoolClientId", {
+      value: this.userPoolClient.userPoolClientId,
     });
   }
 }
