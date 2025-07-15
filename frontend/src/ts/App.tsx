@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Task } from "../models/task";
 import { Project } from "../models/project";
 import { deleteTask, toggleTaskCompletion } from "../services/taskService.ts";
 import { deleteProject } from "../services/projectService.ts";
 import "../styles/index.ts";
-import TaskItem from "../components/TaskItem.tsx";
 import AddTask from "../components/AddTask.tsx";
 import AddProject from "../components/AddProject.tsx";
 import ProjectItem from "../components/ProjectItem.tsx";
 import Dashboard from "../components/Dashboard.tsx";
 import Callback from "../components/Callback.ts";
 import LoginRedirect from "../components/Redirect.ts";
+import TaskView from "../pages/TaskView.tsx";
+import ProjectView from "../pages/ProjectView.tsx"
 
 const getUsernameFromToken = (): string | null => {
   const token = localStorage.getItem("id_token") || "";
@@ -40,6 +36,31 @@ const App: React.FC = () => {
 
   useEffect(() => {
     setUsername(getUsernameFromToken());
+
+    const savedTasks = localStorage.getItem("loaded_tasks");
+    const savedProjects = localStorage.getItem("loaded_projects");
+
+    if (savedTasks) {
+      try {
+        const parsedTasks = JSON.parse(savedTasks);
+        if (Array.isArray(parsedTasks)) {
+          setTasks(parsedTasks);
+        }
+      } catch (e) {
+        console.error("Invalid tasks in localStorage");
+      }
+    }
+
+    if (savedProjects) {
+      try {
+        const parsedProjects = JSON.parse(savedProjects);
+        if (Array.isArray(parsedProjects)) {
+          setProjects(parsedProjects);
+        }
+      } catch (e) {
+        console.error("Invalid projects in localStorage");
+      }
+    }
   }, []);
 
   const handleDeleteTask = (id: string) => {
@@ -67,7 +88,7 @@ const App: React.FC = () => {
     };
 
     const response = await fetch(
-      "https://vvg2f72ym9.execute-api.eu-central-1.amazonaws.com/prod/save",
+      "https://irwtnpcsei.execute-api.eu-central-1.amazonaws.com/prod/save",
       {
         method: "POST",
         headers: {
@@ -90,7 +111,7 @@ const App: React.FC = () => {
     }
 
     const response = await fetch(
-      "https://vvg2f72ym9.execute-api.eu-central-1.amazonaws.com/prod/load",
+      "https://irwtnpcsei.execute-api.eu-central-1.amazonaws.com/prod/load",
       {
         method: "GET",
         headers: {
@@ -106,8 +127,49 @@ const App: React.FC = () => {
     alert(data.message);
   };
 
-  const completedTasks = tasks.filter((task) => task.taskStatus);
-  const pendingTasks: Task[] = tasks.filter((task) => !task.taskStatus);
+  const handleLogout = async () => {
+    const idToken = getIdToken();
+    if (!idToken) {
+      alert("Not logged in.");
+      return;
+    }
+
+    const payload = { tasks, projects };
+
+    try {
+      const response = await fetch(
+        "https://irwtnpcsei.execute-api.eu-central-1.amazonaws.com/prod/save",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Save failed:", errorText);
+        alert("Failed to save data before logout.");
+        return;
+      }
+
+      setTasks([]);
+      setProjects([]);
+      setUsername(null);
+      localStorage.removeItem("id_token");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("loaded_tasks");
+      localStorage.removeItem("loaded_projects");
+
+      alert("Logout successful.");
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("Unexpected error during logout.");
+    }
+  };
 
   return (
     <Router>
@@ -129,7 +191,7 @@ const App: React.FC = () => {
               <Link to="/Menu">Menu</Link>
             </li>
             <li>
-              <a href="https://ni-beh-app-login.auth.eu-central-1.amazoncognito.com/login?response_type=token&client_id=49fmlkpn2urofbnebokhvvmb02&redirect_uri=http://localhost:3000/callback">
+              <a href="https://ni-beh-app-login.auth.eu-central-1.amazoncognito.com/login?response_type=token&client_id=u9srs5rqf4v24seogtbk5tepp&redirect_uri=http://localhost:3000/callback">
                 Login
               </a>
             </li>
@@ -159,6 +221,7 @@ const App: React.FC = () => {
               {username ? `Logged in as: ${username}` : "Not logged in"}
               <button onClick={saveToBackend}>Save</button>
               <button onClick={loadFromBackend}>Load</button>
+              <button onClick={handleLogout}>Logout</button>
             </li>
           </ul>
         </nav>
@@ -210,34 +273,11 @@ const App: React.FC = () => {
           <Route
             path="/tasks"
             element={
-              <div>
-                <div className="pendingTasks">
-                  <h2>Pending Tasks</h2>
-                </div>
-                <ul className="task-list">
-                  {pendingTasks.map((task) => (
-                    <TaskItem
-                      key={task.taskId}
-                      task={task}
-                      toggleCompletion={handleToggleTaskCompletion}
-                      deleteTask={handleDeleteTask}
-                    />
-                  ))}
-                </ul>
-                <div className="completedTasks">
-                  <h2>Completed Tasks</h2>
-                </div>
-                <ul className="task-list completed">
-                  {completedTasks.map((task) => (
-                    <TaskItem
-                      key={task.taskId}
-                      task={task}
-                      toggleCompletion={handleToggleTaskCompletion}
-                      deleteTask={handleDeleteTask}
-                    />
-                  ))}
-                </ul>
-              </div>
+              <TaskView
+                tasks={tasks}
+                toggleCompletion={handleToggleTaskCompletion}
+                deleteTask={handleDeleteTask}
+              />
             }
           />
           <Route
@@ -249,19 +289,10 @@ const App: React.FC = () => {
           <Route
             path="/projects"
             element={
-              <div>
-                <h2>Projects</h2>
-                <div className="project-list">
-                  {projects.map((project) => (
-                    <ProjectItem
-                      key={project.projectId}
-                      project={project}
-                      deleteProject={handleDeleteProject}
-                      tasks={tasks}
-                    />
-                  ))}
-                </div>
-              </div>
+              <ProjectView
+                projects={projects}
+                deleteProject={handleDeleteProject}
+              />
             }
           />
         </Routes>

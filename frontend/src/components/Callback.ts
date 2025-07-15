@@ -19,7 +19,7 @@ const Callback = () => {
     const loadData = async () => {
       try {
         const response = await fetch(
-          "https://vvg2f72ym9.execute-api.eu-central-1.amazonaws.com/prod/load",
+          "https://irwtnpcsei.execute-api.eu-central-1.amazonaws.com/prod/load",
           {
             method: "GET",
             headers: {
@@ -30,8 +30,14 @@ const Callback = () => {
 
         if (response.ok) {
           const data = await response.json();
-          localStorage.setItem("loaded_tasks", JSON.stringify(data.tasks));
-          localStorage.setItem("loaded_projects", JSON.stringify(data.projects));
+          localStorage.setItem(
+            "loaded_tasks",
+            JSON.stringify(data.tasks ?? [])
+          );
+          localStorage.setItem(
+            "loaded_projects",
+            JSON.stringify(data.projects ?? [])
+          );
         } else {
           console.error("Load failed:", await response.text());
         }
@@ -40,11 +46,14 @@ const Callback = () => {
       }
     };
 
-    if (idToken) {
-      loadData();
-    }
+    const run = async () => {
+      if (idToken) {
+        await loadData();
+      }
+      navigate("/Menu");
+    };
 
-    navigate("/Menu");
+    run();
   }, [navigate]);
 
   return null;
