@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { config } from "../config";
+import { config } from "../config.ts";
 
 const Callback = () => {
   const navigate = useNavigate();
