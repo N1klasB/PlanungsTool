@@ -1,20 +1,70 @@
-    .nav-bar ul {
-        background-color: #c3dcff;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        justify-content: left;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        list-style: none;
-        padding: 20px;
-    }
-    
-    .nav-bar a {
-      text-decoration: none;
-      color: #333;
-    }
-    
-    .nav-bar li a:hover {
-      color: #007bff;
-    }
+.nav-bar {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  user-select: none;
+}
+
+.nav-bar ul {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.nav-bar ul li {
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-bar ul li h1 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #222;
+}
+
+.nav-bar ul li a {
+  text-decoration: none;
+  color: #007bff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.nav-bar ul li a:hover,
+.nav-bar ul li a:focus {
+  background-color: #007bff;
+  color: white;
+  outline: none;
+}
+
+.nav-bar ul li:last-child {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.nav-bar ul li:last-child button {
+  cursor: pointer;
+  background-color: #007bff;
+  border: none;
+  padding: 6px 12px;
+  color: white;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.nav-bar ul li:last-child button:hover,
+.nav-bar ul li:last-child button:focus {
+  background-color: #0056b3;
+  outline: none;
+}

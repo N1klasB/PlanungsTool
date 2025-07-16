@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Task } from "../models/task";
 import { generateId } from "../services/idGenerator.ts";
 import { Project } from "../models/project";
+import { Subtask } from "../models/subtask"
 
 interface AddTaskProps {
   tasks: Task[];
@@ -9,16 +10,24 @@ interface AddTaskProps {
   projects: Project[];
 }
 
-const AddTask: React.FC<AddTaskProps> = ({ tasks, setTasks, projects = [] as Project[] }) => {
-  const [subtasks, setSubtasks] = useState<string[]>([]);
+const AddTask: React.FC<AddTaskProps> = ({
+  tasks,
+  setTasks,
+  projects = [] as Project[],
+}) => {
+  const [subtasks, setSubtasks] = useState<string[]>([]); 
   const [subtaskTitle, setSubtaskTitle] = useState<string>("");
-  const [taskTitle, setTaskTitle] = useState<string>("");           //Kapselung in eigne Task klasse
+  const [taskTitle, setTaskTitle] = useState<string>(""); //Kapselung in eigne Task klasse
   const [taskDeadline, setTaskDeadline] = useState<string>("");
   const [taskDescription, setTaskDescription] = useState<string>("");
   const [taskPriority, setTaskPriority] = useState<number>("");
   const [taskEstimatedEffort, setTaskEstimatedEffort] = useState<number>("");
-  const [taskCreationDate, setTaskCreationDate] = useState<string>(new Date().toISOString());
-  const [taskLastModified, setTaskLastModified] = useState<string>(new Date().toISOString());
+  const [taskCreationDate, setTaskCreationDate] = useState<string>(
+    new Date().toISOString()
+  );
+  const [taskLastModified, setTaskLastModified] = useState<string>(
+    new Date().toISOString()
+  );
   const [projectId, setProjectId] = useState<string>("");
 
   const addTask = () => {
@@ -34,7 +43,7 @@ const AddTask: React.FC<AddTaskProps> = ({ tasks, setTasks, projects = [] as Pro
       deadline: taskDeadline || "",
       description: taskDescription || "",
       priority: taskPriority,
-      projectId: projectId || "",
+      projectId: projectId,
       estimatedEffort: taskEstimatedEffort || "",
       creationDate: taskCreationDate,
       lastModified: taskLastModified,
@@ -46,6 +55,9 @@ const AddTask: React.FC<AddTaskProps> = ({ tasks, setTasks, projects = [] as Pro
     setTaskDescription("");
     setTaskPriority();
     setProjectId("");
+    setTaskEstimatedEffort(0);
+    setSubtaskTitle("");
+    setSubtasks([]);
     setTaskEstimatedEffort();
     setTaskCreationDate(new Date().toISOString());
     setTaskLastModified(new Date().toISOString());
@@ -55,15 +67,15 @@ const AddTask: React.FC<AddTaskProps> = ({ tasks, setTasks, projects = [] as Pro
     if (!subtaskTitle) return;
     const newSubtask: Subtask = {
       subtaskId: generateId(),
-      title: subtaskTitle,
-      completed: false,
+      subtaskTitle: subtaskTitle,
+      subtaskStatus: false,
     };
     setSubtasks([...subtasks, newSubtask]);
     setSubtaskTitle("");
   };
-  
+
   const removeSubtask = (id: string) => {
-    setSubtasks(subtasks.filter(st => st.subtaskId !== id));
+    setSubtasks(subtasks.filter((st) => st.subtaskId !== id));
   };
 
   return (
@@ -99,7 +111,9 @@ const AddTask: React.FC<AddTaskProps> = ({ tasks, setTasks, projects = [] as Pro
           {subtasks.map((st) => (
             <li key={st.subtaskId}>
               {st.title}
-              <button onClick={() => removeSubtask(st.subtaskId)}>Remove</button>
+              <button onClick={() => removeSubtask(st.subtaskId)}>
+                Remove
+              </button>
             </li>
           ))}
         </ul>
@@ -108,7 +122,9 @@ const AddTask: React.FC<AddTaskProps> = ({ tasks, setTasks, projects = [] as Pro
         Priority:
         <select
           value={taskPriority}
-          onChange={(e) => setTaskPriority(e.target.value === "" ? "" : +e.target.value)}
+          onChange={(e) =>
+            setTaskPriority(e.target.value === "" ? "" : +e.target.value)
+          }
         >
           <option value="">N/A</option>
           <option value={1}>1 (Low)</option>
@@ -124,12 +140,17 @@ const AddTask: React.FC<AddTaskProps> = ({ tasks, setTasks, projects = [] as Pro
           type="number"
           value={taskEstimatedEffort}
           min={1}
-          onChange={(e) => setTaskEstimatedEffort(e.target.value === "" ? 1 : +e.target.value)}
+          onChange={(e) =>
+            setTaskEstimatedEffort(e.target.value === "" ? 1 : +e.target.value)
+          }
         />
       </label>
       <label>
         Assign to Project:
-        <select value={projectId} onChange={(e) => setProjectId(e.target.value)}>
+        <select
+          value={projectId}
+          onChange={(e) => setProjectId(e.target.value)}
+        >
           <option value="">None</option>
           {projects.map((project) => (
             <option key={project.projectId} value={project.projectId}>

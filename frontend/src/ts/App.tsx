@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";              // React core
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"; // Routing components
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 
 // Models
 import { Task } from "../models/task";
@@ -23,13 +23,13 @@ import { Toaster, toast } from "sonner";
 // Components - Pages
 import LoginRedirect from "../components/Redirect.ts";
 import Callback from "../components/Callback.ts";
+import NavBar from "../components/NavBar.tsx";
 import Menu from "../components/Menu.tsx";
 import Dashboard from "../components/Dashboard.tsx";
 import AddTask from "../components/AddTask.tsx";
 import AddProject from "../components/AddProject.tsx";
 import TaskView from "../components/TaskView.tsx";
 import ProjectView from "../components/ProjectView.tsx";
-
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -167,63 +167,12 @@ const App: React.FC = () => {
   return (
     <Router>
       <div className="app">
-        <nav className="nav-bar">
-          <ul
-            style={{
-              display: "flex",
-              listStyle: "none",
-              gap: "1rem",
-              padding: 0,
-              alignItems: "center",
-            }}
-          >
-            <li>
-              <h1>Planning Assistant</h1>
-            </li>
-            <li>
-              <Link to="/Menu">Menu</Link>
-            </li>
-            <li>
-              <a
-                href={
-                  "https://ni-beh-app-login.auth.eu-central-1.amazoncognito.com/login?response_type=token&client_id=" +
-                  config.USERPOOLCLIENTID +
-                  "&redirect_uri=http://localhost:3000/callback"
-                }
-              >
-                Login
-              </a>
-            </li>
-            <li>
-              <Link to="/Dashboard">Dashboard</Link>
-            </li>
-            <li>
-              <Link to="/add-task">Create new Task</Link>
-            </li>
-            <li>
-              <Link to="/add-project">Create new Project</Link>
-            </li>
-            <li>
-              <Link to="/tasks">Task-Overview</Link>
-            </li>
-            <li>
-              <Link to="/projects">Project-Overview</Link>
-            </li>
-            <li
-              style={{
-                marginLeft: "auto",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              {username ? `Logged in as: ${username}` : "Not logged in"}
-              <button onClick={saveToBackend}>Save</button>
-              <button onClick={loadFromBackend}>Load</button>
-              <button onClick={handleLogout}>Logout</button>
-            </li>
-          </ul>
-        </nav>
+        <NavBar
+          username={username}
+          saveToBackend={saveToBackend}
+          loadFromBackend={loadFromBackend}
+          handleLogout={handleLogout}
+        />
         <Routes>
           <Route path="/" element={<LoginRedirect />} />
           <Route path="/callback" element={<Callback />} />
@@ -273,6 +222,7 @@ const App: React.FC = () => {
                 <ProjectView
                   projects={projects}
                   deleteProject={handleDeleteProject}
+                  tasks={tasks}
                 />
               }
             />

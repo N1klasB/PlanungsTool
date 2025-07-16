@@ -1,14 +1,128 @@
 .project-list {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.project-item {
+  background-color: #ffffff;
+  border: 2px solid #dcdcdc;
+  border-radius: 8px;
+  margin: 1rem 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.project-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  flex: 2;
+  word-break: break-word;
+}
+
+.project-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: #555;
+  flex: 1;
+  align-items: center;
+}
+
+.project-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.project-actions button {
+  padding: 0.5rem 1rem;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.project-actions button:hover {
+  background-color: #155a9c;
+}
+
+.project-actions .delete-button {
+  background-color: #f44336;
+}
+
+.project-actions .delete-button:hover {
+  background-color: #d32f2f;
+}
+
+.project-actions .edit-button {
+  background-color: #ff9800;
+}
+
+.project-actions .edit-button:hover {
+  background-color: #e68900;
+}
+
+.project-tasks {
+  margin-top: 1rem;
+}
+
+.project-tasks h4 {
+  margin-bottom: 0.5rem;
+  color: #222;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.3rem;
+}
+
+.project-tasks ul {
+  list-style: none;
+  padding-left: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 0.4rem;
+  background: white;
+}
+
+.project-tasks li {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #eee;
+  color: #444;
+  cursor: default;
+}
+
+.project-tasks li:last-child {
+  border-bottom: none;
+}
+
+.project-tasks li:hover {
+  background-color: #f0f0f0;
+}
+
+@media (max-width: 600px) {
+  .project-header,
+  .project-info,
+  .project-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .project-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+
+  .project-actions button {
+    width: 100%;
   }
-  
+}

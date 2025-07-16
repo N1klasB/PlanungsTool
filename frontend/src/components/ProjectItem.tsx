@@ -8,20 +8,41 @@ interface ProjectItemProps {
   tasks?: Task[];
 }
 
-const ProjectItem: React.FC<ProjectItemProps> = ({ project, deleteProject, tasks = [] }) => {
-  const tasksForProject = tasks.filter(task => task.projectId === project.projectId);
+const ProjectItem: React.FC<ProjectItemProps> = ({
+  project,
+  deleteProject,
+  tasks = [],
+}) => {
+  const tasksForProject = tasks.filter(
+    (task) => task.projectId === project.projectId
+  );
+
   return (
     <div className="project-item">
-      <h3>{project.title}</h3>
-      <p>{project.description}</p>
-      <p>Start Date: {project.startDate}</p>
-      <p>End Date: {project.endDate}</p>
-      <button onClick={() => deleteProject(project.projectId)}>Delete Project</button>
-      <div className="task-list">
-        <h4>Tasks:</h4>
+      <div className="project-header">
+        <div className="project-title">{project.title}</div>
+        <div className="project-info">
+          <span>Start: {project.startDate || "-"}</span>
+          <span>End: {project.endDate || "-"}</span>
+          <span>{tasksForProject.length} Tasks</span>
+        </div>
+        <div className="project-actions">
+          <button
+            className="delete-button"
+            onClick={() => deleteProject(project.projectId)}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+      <div className="project-description">
+        <p>{project.description || "No description provided."}</p>
+      </div>
+      <div className="project-tasks">
+        <h4>Tasks</h4>
         {tasksForProject.length > 0 ? (
           <ul>
-            {tasksForProject.map(task => (
+            {tasksForProject.map((task) => (
               <li key={task.taskId}>{task.title}</li>
             ))}
           </ul>

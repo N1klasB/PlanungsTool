@@ -6,20 +6,23 @@
     margin: 20px 0;
 }
 
-.dashboard-dropdown {
-    width: 200px;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
-    color: #333;
-    margin: 10px auto;
-    display: block;
+.task-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
-.dashboard-dropdown:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+.task-section {
+  flex: 1;
+  min-width: 150px;
+}
+
+.task-buttons {
+  display: flex;
+  gap: 5px;
 }
