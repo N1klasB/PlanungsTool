@@ -1,20 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";              // React core
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"; // Routing components
+
+// Models
 import { Task } from "../models/task";
 import { Project } from "../models/project";
+
+// Services
 import { deleteTask, toggleTaskCompletion } from "../services/taskService.ts";
 import { deleteProject } from "../services/projectService.ts";
+
+// Styles
 import "../styles/index.ts";
-import AddTask from "../components/AddTask.tsx";
-import AddProject from "../components/AddProject.tsx";
-import Dashboard from "../components/Dashboard.tsx";
-import Callback from "../components/Callback.ts";
-import LoginRedirect from "../components/Redirect.ts";
-import TaskView from "../pages/TaskView.tsx";
-import ProjectView from "../pages/ProjectView.tsx";
+
+// Authentication & Config
 import { config } from "../config.ts";
 import { getIdToken, getUsernameFromToken } from "../auth.ts";
+
+// Components - Utilities
+import ProtectedRoute from "./ProtectedRoute.tsx";
 import { Toaster, toast } from "sonner";
+
+// Components - Pages
+import LoginRedirect from "../components/Redirect.ts";
+import Callback from "../components/Callback.ts";
+import Menu from "../components/Menu.tsx";
+import Dashboard from "../components/Dashboard.tsx";
+import AddTask from "../components/AddTask.tsx";
+import AddProject from "../components/AddProject.tsx";
+import TaskView from "../components/TaskView.tsx";
+import ProjectView from "../components/ProjectView.tsx";
+
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -210,75 +225,58 @@ const App: React.FC = () => {
           </ul>
         </nav>
         <Routes>
-          <Route path="/callback" element={<Callback />} />
           <Route path="/" element={<LoginRedirect />} />
-          <Route
-            path="/Menu"
-            element={
-              <div className="menu-heading">
-                <h1>Planning Assistant</h1>
-                <nav className="menu-buttons">
-                  <li>
-                    <Link to="/Dashboard">Dashboard</Link>
-                  </li>
-                  <li>
-                    <Link to="/add-task">Create new Task</Link>
-                  </li>
-                  <li>
-                    <Link to="/add-project">Create new Project</Link>
-                  </li>
-                  <li>
-                    <Link to="/tasks">Task-Overview</Link>
-                  </li>
-                  <li>
-                    <Link to="/projects">Project-Overview</Link>
-                  </li>
-                </nav>
-              </div>
-            }
-          />
-          <Route
-            path="/Dashboard"
-            element={
-              <Dashboard
-                tasks={tasks}
-                projects={projects}
-                toggleCompletion={handleToggleTaskCompletion}
-                deleteTask={handleDeleteTask}
-              />
-            }
-          />
-          <Route
-            path="/add-task"
-            element={
-              <AddTask tasks={tasks} setTasks={setTasks} projects={projects} />
-            }
-          />
-          <Route
-            path="/tasks"
-            element={
-              <TaskView
-                tasks={tasks}
-                toggleCompletion={handleToggleTaskCompletion}
-                deleteTask={handleDeleteTask}
-              />
-            }
-          />
-          <Route
-            path="/add-project"
-            element={
-              <AddProject projects={projects} setProjects={setProjects} />
-            }
-          />
-          <Route
-            path="/projects"
-            element={
-              <ProjectView
-                projects={projects}
-                deleteProject={handleDeleteProject}
-              />
-            }
-          />
+          <Route path="/callback" element={<Callback />} />
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/Menu" element={<Menu />} />
+            <Route
+              path="/Dashboard"
+              element={
+                <Dashboard
+                  tasks={tasks}
+                  projects={projects}
+                  toggleCompletion={handleToggleTaskCompletion}
+                  deleteTask={handleDeleteTask}
+                />
+              }
+            />
+            <Route
+              path="/add-task"
+              element={
+                <AddTask
+                  tasks={tasks}
+                  setTasks={setTasks}
+                  projects={projects}
+                />
+              }
+            />
+            <Route
+              path="/tasks"
+              element={
+                <TaskView
+                  tasks={tasks}
+                  toggleCompletion={handleToggleTaskCompletion}
+                  deleteTask={handleDeleteTask}
+                />
+              }
+            />
+            <Route
+              path="/add-project"
+              element={
+                <AddProject projects={projects} setProjects={setProjects} />
+              }
+            />
+            <Route
+              path="/projects"
+              element={
+                <ProjectView
+                  projects={projects}
+                  deleteProject={handleDeleteProject}
+                />
+              }
+            />
+          </Route>
         </Routes>
       </div>
       <Toaster position="top-left" theme="light" />
