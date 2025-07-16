@@ -125,5 +125,6 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
     new cdk.CfnOutput(this, "UserPoolClientId", {
       value: this.userPoolClient.userPoolClientId,
     });
+
   }
 }

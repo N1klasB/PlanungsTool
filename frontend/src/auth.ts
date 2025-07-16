@@ -4,10 +4,11 @@ import {
   CognitoUserPool,
   CognitoUserSession,
 } from "amazon-cognito-identity-js";
+import { config } from "./config.ts";
 
 const poolData = {
-  UserPoolId: "eu-central-1_wbicJv3W3", //cf output einfügen
-  ClientId: "49fmlkpn2urofbnebokhvvmb02", //cf output einfügen
+  UserPoolId: config.USERPOOLID,
+  ClientId: config.USERPOOLCLIENTID,
 };
 
 const userPool = new CognitoUserPool(poolData);
@@ -36,14 +37,17 @@ export function login(
   });
 }
 
-export function getAccessToken(): Promise<string | null> {
-  return new Promise((resolve) => {
-    const currentUser = userPool.getCurrentUser();
-    if (!currentUser) return resolve(null);
+export function getIdToken(): string | null {
+  return localStorage.getItem("id_token") || null;
+}
 
-    currentUser.getSession((err, session) => {
-      if (err || !session) return resolve(null);
-      resolve(session.getAccessToken().getJwtToken());
-    });
-  });
+export function getUsernameFromToken(): string | null {
+  const token = localStorage.getItem("id_token") || "";
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload["cognito:username"] || null;
+  } catch {
+    return null;
+  }
 }

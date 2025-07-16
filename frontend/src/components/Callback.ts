@@ -19,7 +19,7 @@ const Callback = () => {
     const loadData = async () => {
       try {
         const response = await fetch(
-          "https://irwtnpcsei.execute-api.eu-central-1.amazonaws.com/prod/load",
+          "/load",
           {
             method: "GET",
             headers: {

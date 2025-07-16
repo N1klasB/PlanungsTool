@@ -7,27 +7,14 @@ import { deleteProject } from "../services/projectService.ts";
 import "../styles/index.ts";
 import AddTask from "../components/AddTask.tsx";
 import AddProject from "../components/AddProject.tsx";
-import ProjectItem from "../components/ProjectItem.tsx";
 import Dashboard from "../components/Dashboard.tsx";
 import Callback from "../components/Callback.ts";
 import LoginRedirect from "../components/Redirect.ts";
 import TaskView from "../pages/TaskView.tsx";
-import ProjectView from "../pages/ProjectView.tsx"
-
-const getUsernameFromToken = (): string | null => {
-  const token = localStorage.getItem("id_token") || "";
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload["cognito:username"] || null;
-  } catch {
-    return null;
-  }
-};
-
-const getIdToken = (): string | null => {
-  return localStorage.getItem("id_token") || null;
-};
+import ProjectView from "../pages/ProjectView.tsx";
+import { config } from "../config.ts";
+import { getIdToken, getUsernameFromToken } from "../auth.ts";
+import { Toaster, toast } from "sonner";
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -78,7 +65,7 @@ const App: React.FC = () => {
   const saveToBackend = async () => {
     const idToken = getIdToken();
     if (!idToken) {
-      alert("Not logged in.");
+      toast("Not logged in.");
       return;
     }
 
@@ -87,72 +74,63 @@ const App: React.FC = () => {
       projects,
     };
 
-    const response = await fetch(
-      "https://irwtnpcsei.execute-api.eu-central-1.amazonaws.com/prod/save",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+    const response = await fetch(config.APIURL + "/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
     const data = await response.json();
-    alert(data.message);
+    toast(data.message);
   };
 
   const loadFromBackend = async () => {
     const idToken = getIdToken();
     if (!idToken) {
-      alert("Not logged in.");
+      toast("Not logged in.");
       return;
     }
 
-    const response = await fetch(
-      "https://irwtnpcsei.execute-api.eu-central-1.amazonaws.com/prod/load",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
-        },
-      }
-    );
+    const response = await fetch(config.APIURL + "/load", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+    });
 
     const data = await response.json();
     if (data.tasks) setTasks(data.tasks);
     if (data.projects) setProjects(data.projects);
-    alert(data.message);
+    toast(data.message);
   };
 
   const handleLogout = async () => {
     const idToken = getIdToken();
     if (!idToken) {
-      alert("Not logged in.");
+      toast("Not logged in.");
       return;
     }
 
     const payload = { tasks, projects };
 
     try {
-      const response = await fetch(
-        "https://irwtnpcsei.execute-api.eu-central-1.amazonaws.com/prod/save",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(config.APIURL + "/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Save failed:", errorText);
-        alert("Failed to save data before logout.");
+        toast("Failed to save data before logout.");
         return;
       }
 
@@ -164,10 +142,10 @@ const App: React.FC = () => {
       localStorage.removeItem("loaded_tasks");
       localStorage.removeItem("loaded_projects");
 
-      alert("Logout successful.");
+      toast("Logout successful.");
     } catch (error) {
       console.error("Logout error:", error);
-      alert("Unexpected error during logout.");
+      toast("Unexpected error during logout.");
     }
   };
 
@@ -191,7 +169,13 @@ const App: React.FC = () => {
               <Link to="/Menu">Menu</Link>
             </li>
             <li>
-              <a href="https://ni-beh-app-login.auth.eu-central-1.amazoncognito.com/login?response_type=token&client_id=u9srs5rqf4v24seogtbk5tepp&redirect_uri=http://localhost:3000/callback">
+              <a
+                href={
+                  "https://ni-beh-app-login.auth.eu-central-1.amazoncognito.com/login?response_type=token&client_id=" +
+                  config.USERPOOLCLIENTID +
+                  "&redirect_uri=http://localhost:3000/callback"
+                }
+              >
                 Login
               </a>
             </li>
@@ -297,6 +281,7 @@ const App: React.FC = () => {
           />
         </Routes>
       </div>
+      <Toaster position="top-left" theme="light" />
     </Router>
   );
 };
