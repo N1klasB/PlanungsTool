@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { config } from "../config";
 
 const Callback = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Callback = () => {
     const loadData = async () => {
       try {
         const response = await fetch(
-          "/load",
+          config.APIURL+"/load",
           {
             method: "GET",
             headers: {
