@@ -1,40 +1,36 @@
 .add-task-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.add-task-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 1.8rem;
-  color: #333;
-}
-
-.add-task-container input,
-.add-task-container textarea,
-.add-task-container select,
-.add-task-container label {
-  width: 100%;
-  margin-bottom: 15px;
-  display: block;
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: sans-serif;
 }
 
 .add-task-container input,
 .add-task-container textarea,
 .add-task-container select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
 }
 
 .add-task-container button {
-  width: 100%;
-  padding: 10px 15px;
-  font-size: 1.2rem;
-  font-weight: bold;
+  padding: 0.5rem 1rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+.subtasks-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.subtasks-section li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
 }
