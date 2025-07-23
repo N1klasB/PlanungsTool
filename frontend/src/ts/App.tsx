@@ -28,7 +28,6 @@ import Menu from "../components/Menu.tsx";
 import Dashboard from "../components/Dashboard.tsx";
 import AddTask from "../components/AddTask.tsx";
 import AddProject from "../components/AddProject.tsx";
-import TaskView from "../components/TaskView.tsx";
 import ProjectView from "../components/ProjectView.tsx";
 
 const App: React.FC = () => {
@@ -178,7 +177,6 @@ const App: React.FC = () => {
           <Route path="/callback" element={<Callback />} />
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/Menu" element={<Menu />} />
             <Route
               path="/Dashboard"
               element={
@@ -197,16 +195,6 @@ const App: React.FC = () => {
                   tasks={tasks}
                   setTasks={setTasks}
                   projects={projects}
-                />
-              }
-            />
-            <Route
-              path="/tasks"
-              element={
-                <TaskView
-                  tasks={tasks}
-                  toggleCompletion={handleToggleTaskCompletion}
-                  deleteTask={handleDeleteTask}
                 />
               }
             />
