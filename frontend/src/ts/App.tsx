@@ -24,7 +24,6 @@ import { Toaster, toast } from "sonner";
 import LoginRedirect from "../components/Redirect.ts";
 import Callback from "../components/Callback.ts";
 import NavBar from "../components/NavBar.tsx";
-import Menu from "../components/Menu.tsx";
 import Dashboard from "../components/Dashboard.tsx";
 import AddTask from "../components/AddTask.tsx";
 import AddProject from "../components/AddProject.tsx";

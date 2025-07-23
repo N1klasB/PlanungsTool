@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Task } from "../models/task";
+import { linkify } from "../services/linkify.tsx";
 
 interface TaskItemProps {
   task: Task;
@@ -93,7 +94,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
         <div className="overlay" onClick={toggleOverlay}>
           <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
             <h3>Description</h3>
-            <p>{task.description || "No description available."}</p>
+            <p>{linkify(task.description || "No description available.")}</p>
             <button className="close-button" onClick={toggleOverlay}>
               Close
             </button>

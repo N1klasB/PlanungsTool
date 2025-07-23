@@ -52,7 +52,13 @@ const Dashboard: React.FC<DashboardProps> = ({
     }
 
     if (sortOption === "deadline") {
-      return DateToTime(a.deadline) - DateToTime(b.deadline);
+      return a.deadline && b.deadline
+        ? DateToTime(a.deadline) - DateToTime(b.deadline)
+        : a.deadline
+        ? -1
+        : b.deadline
+        ? 1
+        : 0;
     }
 
     if (sortOption === "combined") {
@@ -153,9 +159,9 @@ const Dashboard: React.FC<DashboardProps> = ({
             onChange={(e) => setFilterOption(e.target.value as FilterOption)}
             value={filterOption}
           >
-            <option value="all">Alle</option>
-            <option value="open">Offen</option>
-            <option value="completed">Erledigt</option>
+            <option value="all">All</option>
+            <option value="open">Open</option>
+            <option value="completed">Completed</option>
           </select>
         </div>
       </div>
