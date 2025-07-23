@@ -51,7 +51,7 @@ const Callback = () => {
       if (idToken) {
         await loadData();
       }
-      navigate("/Menu");
+      navigate("/Dashboard");
     };
 
     run();
