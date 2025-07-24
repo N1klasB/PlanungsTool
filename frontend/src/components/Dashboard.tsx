@@ -27,6 +27,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const [sortOption, setSortOption] = useState<SortOption>("combined");
   const [filterOption, setFilterOption] = useState<FilterOption>("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const now = new Date().getTime();
 
@@ -41,9 +42,13 @@ const Dashboard: React.FC<DashboardProps> = ({
     : 0;
 
   const filteredTasks = tasks.filter((task) => {
-    if (filterOption === "completed") return task.taskStatus;
-    if (filterOption === "open") return !task.taskStatus;
-    return true;
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    if (filterOption === "completed") return task.taskStatus && matchesSearch;
+    if (filterOption === "open") return !task.taskStatus && matchesSearch;
+    return matchesSearch;
   });
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
@@ -72,6 +77,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
       return scoreA - scoreB;
     }
+    
 
     return 0;
   });
@@ -83,18 +89,14 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const COLORS = ["#4caf50", "#f44336"];
 
+  
+
   return (
-    <div>
-      <h2>Dashboard</h2>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "2rem",
-        }}
-      >
-        <div className="dashboard-kpis">
+    <div className="dashboard-container">
+      <h2 className="dashboard-heading">Dashboard</h2>
+
+      <div className="dashboard-top">
+        <div className="dashboard-box kpi-box">
           <p>
             <strong>Number of Tasks:</strong> {totalTasks}
           </p>
@@ -107,13 +109,19 @@ const Dashboard: React.FC<DashboardProps> = ({
           <p>
             <strong>Overdue:</strong> {overdueTasks}
           </p>
-          <p>
-            <strong>Completion rate:</strong> {completionRate}%
-          </p>
         </div>
-
-        <div style={{ width: "300px", height: "300px" }}>
-          <ResponsiveContainer>
+        <div className="dashboard-box progress-box">
+          <label>Progress:</label>
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${completionRate}%` }}
+            />
+          </div>
+          <small>{completionRate}% completion</small>
+        </div>
+        <div className="dashboard-box pie-box">
+          <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 data={pieData}
@@ -138,18 +146,27 @@ const Dashboard: React.FC<DashboardProps> = ({
           </ResponsiveContainer>
         </div>
       </div>
-
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+      <div className="dashboard-box search-box">
+        <label htmlFor="search">Search Tasks:</label>
+        <input
+          type="text"
+          id="search"
+          placeholder="Search by title..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      <div className="dashboard-box filter-box">
         <div className="dropdown-container">
-          <label className="dropdown-label">Sortieren nach:</label>
+          <label className="dropdown-label">Filter:</label>
           <select
             className="dropdown-select"
             onChange={(e) => setSortOption(e.target.value as SortOption)}
             value={sortOption}
           >
-            <option value="priority">Priorität</option>
+            <option value="priority">Priority</option>
             <option value="deadline">Deadline</option>
-            <option value="combined">Kombiniert</option>
+            <option value="combined">Combined</option>
           </select>
         </div>
         <div className="dropdown-container">
@@ -165,21 +182,25 @@ const Dashboard: React.FC<DashboardProps> = ({
           </select>
         </div>
       </div>
-
-      <ul className="task-list">
-        {sortedTasks.length > 0 ? (
-          sortedTasks.map((task) => (
-            <TaskItem
-              key={task.taskId}
-              task={task}
-              toggleCompletion={toggleCompletion}
-              deleteTask={deleteTask}
-            />
-          ))
-        ) : (
-          <p>No Tasks Found.</p>
-        )}
-      </ul>
+      <div className="task-projects-row">
+        <ul className="task-list">
+          {sortedTasks.length > 0 ? (
+            sortedTasks.map((task) => (
+              <TaskItem
+                key={task.taskId}
+                task={task}
+                toggleCompletion={toggleCompletion}
+                deleteTask={deleteTask}
+              />
+            ))
+          ) : (
+            <p>No Tasks Found.</p>
+          )}
+        </ul>
+        <div className="project-box">
+          <h3>Projects</h3>
+        </div>
+      </div>
     </div>
   );
 };
