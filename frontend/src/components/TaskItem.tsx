@@ -1,22 +1,29 @@
 import React, { useState } from "react";
 import { Task } from "../models/task";
 import { linkify } from "../services/linkify.tsx";
+import EditTaskOverlay from "./EditTaskOverlay.tsx";
 
 interface TaskItemProps {
   task: Task;
   toggleCompletion: (id: string) => void;
   deleteTask: (id: string) => void;
+  projects: Project[];
+  onUpdateTask: (updatedTask: Task) => void;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({
   task,
+  projects,
   toggleCompletion,
   deleteTask,
+  onUpdateTask,
 }) => {
   const [isDescriptionOverlayVisible, setDescriptionOverlayVisible] =
     useState<boolean>(false);
   const [isSubtaskOverlayVisible, setSubtaskOverlayVisible] =
     useState<boolean>(false);
+  const [isEditOverlayVisible, setEditOverlayVisible] =
+    useState<boolean>(false); // Neu
 
   const toggleOverlay = () => {
     setDescriptionOverlayVisible(!isDescriptionOverlayVisible);
@@ -24,6 +31,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
   const toggleSubtaskOverlay = () => {
     setSubtaskOverlayVisible(!isSubtaskOverlayVisible);
+  };
+
+  const toggleEditOverlay = () => {
+    setEditOverlayVisible(!isEditOverlayVisible);
   };
 
   const toggleSubtask = (subtaskId: string) => {
@@ -52,8 +63,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
   return (
     <>
       <li className={`task-item ${task.taskStatus ? "completed" : ""}`}>
-        <div className="task-container">
-          <div className="title-box">{task.title}</div>
+        <div className="task-header">
+          <div className="clickable-title" onClick={toggleEditOverlay}>
+            {task.title}
+          </div>
           <div className="deadline-box">Deadline: {task.deadline || "-"}</div>
         </div>
         <div className="task-box">
@@ -67,7 +80,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
             <span>{task.subtasks.length} Subtasks</span>
             <button className="view-subtasks" onClick={toggleSubtaskOverlay}>
               View
-            </button>{" "}
+            </button>
           </div>
         )}
         <div className="task-box">
@@ -90,6 +103,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
           </div>
         </div>
       </li>
+
+      {/* Description Overlay */}
       {isDescriptionOverlayVisible && (
         <div className="overlay" onClick={toggleOverlay}>
           <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
@@ -101,6 +116,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
           </div>
         </div>
       )}
+
+      {/* Subtask Overlay */}
       {isSubtaskOverlayVisible && (
         <div className="overlay" onClick={toggleSubtaskOverlay}>
           <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
@@ -124,6 +141,19 @@ const TaskItem: React.FC<TaskItemProps> = ({
             </button>
           </div>
         </div>
+      )}
+
+      {/* Edit Overlay (Platzhalter) */}
+      {isEditOverlayVisible && (
+        <EditTaskOverlay
+          task={task}
+          projects={projects}
+          onClose={toggleEditOverlay}
+          onSave={(updatedTask) => {
+            onUpdateTask(updatedTask);
+            toggleEditOverlay();
+          }}
+        />
       )}
     </>
   );

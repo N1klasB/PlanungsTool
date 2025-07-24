@@ -10,11 +10,14 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { Project } from "../models/project.ts";
 
 interface DashboardProps {
   tasks: Task[];
   toggleCompletion: (id: string) => void;
   deleteTask: (id: string) => void;
+  projects: Project[];
+  onUpdateTask: (task: Task) => void;
 }
 
 type SortOption = "priority" | "deadline" | "combined";
@@ -22,8 +25,10 @@ type FilterOption = "all" | "open" | "completed";
 
 const Dashboard: React.FC<DashboardProps> = ({
   tasks,
+  projects,
   toggleCompletion,
   deleteTask,
+  onUpdateTask,
 }) => {
   const [sortOption, setSortOption] = useState<SortOption>("combined");
   const [filterOption, setFilterOption] = useState<FilterOption>("all");
@@ -77,7 +82,6 @@ const Dashboard: React.FC<DashboardProps> = ({
 
       return scoreA - scoreB;
     }
-    
 
     return 0;
   });
@@ -88,8 +92,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   ];
 
   const COLORS = ["#4caf50", "#f44336"];
-
-  
 
   return (
     <div className="dashboard-container">
@@ -191,6 +193,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                 task={task}
                 toggleCompletion={toggleCompletion}
                 deleteTask={deleteTask}
+                projects={projects}
+                onUpdateTask={onUpdateTask}
               />
             ))
           ) : (

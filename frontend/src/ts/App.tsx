@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Models
 import { Task } from "../models/task";
@@ -73,6 +73,12 @@ const App: React.FC = () => {
 
   const handleDeleteProject = (id: string) => {
     setProjects(deleteProject(projects, id));
+  };
+
+  const handleUpdateTask = (updatedTask: Task) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((t) => (t.taskId === updatedTask.taskId ? updatedTask : t))
+    );
   };
 
   const saveToBackend = async () => {
@@ -184,6 +190,7 @@ const App: React.FC = () => {
                   projects={projects}
                   toggleCompletion={handleToggleTaskCompletion}
                   deleteTask={handleDeleteTask}
+                  onUpdateTask={handleUpdateTask}
                 />
               }
             />

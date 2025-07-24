@@ -30,6 +30,29 @@
   word-break: break-word;
 }
 
+.task-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.clickable-title {
+  flex: 2;
+  font-weight: bold;
+  font-size: 1.1rem;
+  word-break: break-word;
+  color: #1976d2;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.clickable-title:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}
+
+
 .deadline-box {
   flex: 1;
   font-size: 0.95rem;
