@@ -19,15 +19,13 @@ const Callback = () => {
 
     const loadData = async () => {
       try {
-        const response = await fetch(
-          config.APIURL+"/load",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-            },
-          }
-        );
+        const response = await fetch(config.APIURL + "/load", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
 
         if (response.ok) {
           const data = await response.json();
