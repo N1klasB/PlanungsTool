@@ -40,8 +40,18 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
       },
     });
 
+    const editLambda = new lambda.Function(this, "NiBehEditLambda", {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: "edit.handler",
+      code: lambda.Code.fromAsset("lambda"),
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+
     table.grantReadData(loadLambda);
     table.grantWriteData(saveLambda);
+    table.grantWriteData(editLambda);
 
     // Cognito User Pool
     this.userPool = new cognito.UserPool(this, "NiBehUserPool", {
@@ -113,6 +123,12 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
       authorizationType: apigw.AuthorizationType.COGNITO,
     });
 
+    const edit = restApi.root.addResource("edit");
+    edit.addMethod("POST", new apigw.LambdaIntegration(editLambda), {
+      authorizer,
+      authorizationType: apigw.AuthorizationType.COGNITO,
+    })
+
     // CloudFormation Outputs
     new cdk.CfnOutput(this, "ApiUrl", {
       value: restApi.url,
@@ -125,6 +141,5 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
     new cdk.CfnOutput(this, "UserPoolClientId", {
       value: this.userPoolClient.userPoolClientId,
     });
-
   }
 }
