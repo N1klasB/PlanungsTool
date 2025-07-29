@@ -22,8 +22,18 @@ const ProjectItem: React.FC<ProjectItemProps> = ({
       <div className="project-header">
         <div className="project-title">{project.title}</div>
         <div className="project-info">
-          <span>Start: {project.startDate || "-"}</span>
-          <span>End: {project.endDate || "-"}</span>
+          <span>
+            Start:{" "}
+            {project.startDate
+              ? new Date(project.startDate).toLocaleString("de-DE")
+              : "-"}
+          </span>
+          <span>
+            End:{" "}
+            {project.endDate
+              ? new Date(project.endDate).toLocaleString("de-DE")
+              : "-"}
+          </span>
           <span>{tasksForProject.length} Tasks</span>
         </div>
         <div className="project-actions">

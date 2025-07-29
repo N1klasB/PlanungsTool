@@ -127,6 +127,28 @@ const App: React.FC = () => {
     toast(data.message);
   };
 
+  const updateTaskBackend = async (
+    partialTask: Partial<Task> & { taskId: string }
+  ) => {
+    const idToken = getIdToken();
+    if (!idToken) {
+      toast("Not logged in.");
+      return;
+    }
+
+    const response = await fetch(config.APIURL + "/edit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ tasks: [partialTask] }),
+    });
+
+    const data = await response.json();
+    toast(data.message);
+  };
+
   const handleLogout = async () => {
     const idToken = getIdToken();
     if (!idToken) {
@@ -191,6 +213,7 @@ const App: React.FC = () => {
                   toggleCompletion={handleToggleTaskCompletion}
                   deleteTask={handleDeleteTask}
                   onUpdateTask={handleUpdateTask}
+                  updateTaskBackend={updateTaskBackend}
                 />
               }
             />

@@ -18,6 +18,7 @@ interface DashboardProps {
   deleteTask: (id: string) => void;
   projects: Project[];
   onUpdateTask: (task: Task) => void;
+  updateTaskBackend: (partialTask: Partial<Task> & { taskId: string }) => void;
 }
 
 type SortOption = "priority" | "deadline" | "combined";
@@ -29,6 +30,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   toggleCompletion,
   deleteTask,
   onUpdateTask,
+  updateTaskBackend,
 }) => {
   const [sortOption, setSortOption] = useState<SortOption>("combined");
   const [filterOption, setFilterOption] = useState<FilterOption>("all");
@@ -195,6 +197,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 deleteTask={deleteTask}
                 projects={projects}
                 onUpdateTask={onUpdateTask}
+                updateTaskBackend={updateTaskBackend}
               />
             ))
           ) : (

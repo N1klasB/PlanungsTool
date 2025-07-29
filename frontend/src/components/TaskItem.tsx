@@ -9,6 +9,9 @@ interface TaskItemProps {
   deleteTask: (id: string) => void;
   projects: Project[];
   onUpdateTask: (updatedTask: Task) => void;
+  updateTaskBackend: (
+    partialTask: Partial<Task> & { taskId: string }
+  ) => Promise<void>;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({
@@ -17,13 +20,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
   toggleCompletion,
   deleteTask,
   onUpdateTask,
+  updateTaskBackend,
 }) => {
   const [isDescriptionOverlayVisible, setDescriptionOverlayVisible] =
     useState<boolean>(false);
   const [isSubtaskOverlayVisible, setSubtaskOverlayVisible] =
     useState<boolean>(false);
   const [isEditOverlayVisible, setEditOverlayVisible] =
-    useState<boolean>(false); // Neu
+    useState<boolean>(false);
 
   const toggleOverlay = () => {
     setDescriptionOverlayVisible(!isDescriptionOverlayVisible);
@@ -149,8 +153,20 @@ const TaskItem: React.FC<TaskItemProps> = ({
           task={task}
           projects={projects}
           onClose={toggleEditOverlay}
-          onSave={(updatedTask) => {
+          onSave={async (updatedFields: Partial<Task>) => {
+            const hasChanges = Object.keys(updatedFields).some(
+              (key) => (task as any)[key] !== (updatedFields as any)[key]
+            );
+            if (!hasChanges) {
+              toggleEditOverlay();
+              return;
+            }
+            const updatedTask = { ...task, ...updatedFields };
             onUpdateTask(updatedTask);
+            await updateTaskBackend({
+              taskId: task.taskId,
+              ...updatedFields,
+            });
             toggleEditOverlay();
           }}
         />
