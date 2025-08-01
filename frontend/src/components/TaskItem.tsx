@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Task } from "../models/task";
 import { linkify } from "../services/linkify.tsx";
 import EditTaskOverlay from "./EditTaskOverlay.tsx";
+import Subtasks from "./Subtasks.tsx";
 
 interface TaskItemProps {
   task: Task;
@@ -41,26 +42,28 @@ const TaskItem: React.FC<TaskItemProps> = ({
     setEditOverlayVisible(!isEditOverlayVisible);
   };
 
-  const toggleSubtask = (subtaskId: string) => {
-    const updatedSubtasks =
-      task.subtasks?.map((st) => {
-        if (st.subtaskId === subtaskId) {
-          return { ...st, completed: !st.completed };
-        }
-        return st;
-      }) || [];
+const toggleSubtask = async (subtaskId: string) => {
+  const updatedSubtasks =
+    task.subtasks?.map((st) => {
+      if (st.subtaskId === subtaskId) {
+        return { ...st, subtaskStatus: !st.subtaskStatus };
+      }
+      return st;
+    }) || [];
 
-    const updatedTask = {
-      ...task,
-      subtasks: updatedSubtasks,
-    };
-
-    console.warn("Update Task logic here with:", updatedTask);
+  const updatedTask = {
+    ...task,
+    subtasks: updatedSubtasks,
   };
+
+  onUpdateTask(updatedTask); 
+};
 
   const calculateProgress = () => {
     if (!task.subtasks || task.subtasks.length === 0) return 0;
-    const completedCount = task.subtasks.filter((st) => st.completed).length;
+    const completedCount = task.subtasks.filter(
+      (st) => st.subtaskStatus
+    ).length;
     return Math.round((completedCount / task.subtasks.length) * 100);
   };
 
@@ -81,7 +84,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
         </div>
         {task.subtasks && task.subtasks.length > 0 && (
           <div className="task-box">
-            <span>{task.subtasks.length} Subtasks</span>
+            <span>
+              {task.subtasks.filter((st) => st.subtaskStatus).length}/
+              {task.subtasks.length} Subtasks done
+            </span>
             <button className="view-subtasks" onClick={toggleSubtaskOverlay}>
               View
             </button>
@@ -122,29 +128,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
       )}
 
       {/* Subtask Overlay */}
-      {isSubtaskOverlayVisible && (
-        <div className="overlay" onClick={toggleSubtaskOverlay}>
-          <div className="overlay-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Subtasks ({calculateProgress()}% done)</h3>
-            <ul className="subtask-list">
-              {task.subtasks?.map((st) => (
-                <li key={st.subtaskId}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={st.completed}
-                      onChange={() => toggleSubtask(st.subtaskId)}
-                    />
-                    {st.title}
-                  </label>
-                </li>
-              ))}
-            </ul>
-            <button className="close-button" onClick={toggleSubtaskOverlay}>
-              Close
-            </button>
-          </div>
-        </div>
+      {isSubtaskOverlayVisible && task.subtasks && (
+        <Subtasks
+          subtasks={task.subtasks}
+          toggleSubtask={toggleSubtask}
+          onClose={toggleSubtaskOverlay}
+        />
       )}
 
       {/* Edit Overlay (Platzhalter) */}

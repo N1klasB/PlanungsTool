@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Task } from "../models/task";
 import { generateId } from "../services/idGenerator.ts";
 import { Project } from "../models/project";
-import { Subtask } from "../models/subtask"
+import { Subtask } from "../models/subtask";
 
 interface AddTaskProps {
   tasks: Task[];
@@ -15,7 +15,7 @@ const AddTask: React.FC<AddTaskProps> = ({
   setTasks,
   projects = [] as Project[],
 }) => {
-  const [subtasks, setSubtasks] = useState<string[]>([]); 
+  const [subtasks, setSubtasks] = useState<string[]>([]);
   const [subtaskTitle, setSubtaskTitle] = useState<string>("");
   const [taskTitle, setTaskTitle] = useState<string>(""); //Kapselung in eigne Task klasse
   const [taskDeadline, setTaskDeadline] = useState<string>("");
@@ -110,8 +110,15 @@ const AddTask: React.FC<AddTaskProps> = ({
         <ul>
           {subtasks.map((st) => (
             <li key={st.subtaskId}>
-              {st.title}
-              <button onClick={() => removeSubtask(st.subtaskId)}>
+              {st.subtaskTitle}
+              <button
+                onClick={() => removeSubtask(st.subtaskId)}
+                style={{
+                  color: "white",
+                  backgroundColor: "red",
+                  marginLeft: "10px",
+                }}
+              >
                 Remove
               </button>
             </li>
