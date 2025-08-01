@@ -52,14 +52,13 @@
   text-decoration: underline;
 }
 
-
 .deadline-box {
   flex: 1;
   font-size: 0.95rem;
   color: #666;
 }
 
-.task-box {
+.task-detail {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
@@ -105,11 +104,11 @@ button:hover {
   background-color: #e68900;
 }
 
-.task-box button.view-subtasks {
+.task-detail button.view-subtasks {
   background-color: #9c27b0;
 }
 
-.task-box button.view-subtasks:hover {
+.task-detail button.view-subtasks:hover {
   background-color: #7b1fa2;
 }
 

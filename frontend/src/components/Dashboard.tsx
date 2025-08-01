@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Task } from "../models/task";
 import TaskItem from "./TaskItem.tsx";
+import ProjectItem from "./ProjectItem.tsx";
 import { DateToTime } from "../services/dateToTime.ts";
 import {
   PieChart,
@@ -125,7 +126,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <small>{completionRate}% completion</small>
         </div>
         <div className="dashboard-box pie-box">
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer className="pie-chart-container">
             <PieChart>
               <Pie
                 data={pieData}
@@ -187,7 +188,8 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
       <div className="task-projects-row">
-        <ul className="task-list">
+        <div className="task-box">
+          <h3>Tasks:</h3>
           {sortedTasks.length > 0 ? (
             sortedTasks.map((task) => (
               <TaskItem
@@ -203,9 +205,23 @@ const Dashboard: React.FC<DashboardProps> = ({
           ) : (
             <p>No Tasks Found.</p>
           )}
-        </ul>
+        </div>
         <div className="project-box">
-          <h3>Projects</h3>
+          <h3>Projects:</h3>
+          {projects.length > 0 ? (
+            projects.map((project) => (
+              <ProjectItem
+                key={project.projectId}
+                project={project}
+                deleteProject={() => {}}
+                tasks={tasks.filter(
+                  (task) => task.projectId === project.projectId
+                )}
+              />
+            ))
+          ) : (
+            <p>No Projects Found.</p>
+          )}
         </div>
       </div>
     </div>

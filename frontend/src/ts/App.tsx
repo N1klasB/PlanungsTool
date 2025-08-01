@@ -233,16 +233,6 @@ const App: React.FC = () => {
                 <AddProject projects={projects} setProjects={setProjects} />
               }
             />
-            <Route
-              path="/projects"
-              element={
-                <ProjectView
-                  projects={projects}
-                  deleteProject={handleDeleteProject}
-                  tasks={tasks}
-                />
-              }
-            />
           </Route>
         </Routes>
       </div>

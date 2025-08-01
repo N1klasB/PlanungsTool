@@ -37,9 +37,6 @@ const NavBar: React.FC<NavBarProps> = ({
       <li>
         <Link to="/add-project">Create new Project</Link>
       </li>
-      <li>
-        <Link to="/projects">Project-Overview</Link>
-      </li>
       <li
         style={{
           marginLeft: "auto",
