@@ -6,53 +6,69 @@ const Callback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.replace("#", ""));
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
 
-    const accessToken = params.get("access_token");
-    const idToken = params.get("id_token");
+    console.log("Authorization Code:", code);
 
-    if (accessToken) {
-      localStorage.setItem("access_token", accessToken);
-      localStorage.setItem("id_token", idToken ?? "");
+    if (!code) {
+      console.error("No authorization code found in URL");
+      navigate("/");
+      return;
     }
 
-    const loadData = async () => {
+    const exchangeCodeForTokens = async () => {
       try {
-        const response = await fetch(config.APIURL + "/load", {
+        const body = new URLSearchParams({
+          grant_type: "authorization_code",
+          client_id: config.USERPOOLCLIENTID,
+          code,
+          redirect_uri: config.CALLBACK_URL,
+        });
+
+        const tokenResponse = await fetch(`${config.COGNITO_DOMAIN}/oauth2/token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: body.toString(),
+        });
+
+        if (!tokenResponse.ok) {
+          const text = await tokenResponse.text();
+          throw new Error(`Token request failed: ${text}`);
+        }
+
+        const data = await tokenResponse.json();
+
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("id_token", data.id_token);
+
+        const loadResponse = await fetch(config.APIURL + "/load", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
+            Authorization: `Bearer ${data.id_token}`,
           },
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem(
-            "loaded_tasks",
-            JSON.stringify(data.tasks ?? [])
-          );
-          localStorage.setItem(
-            "loaded_projects",
-            JSON.stringify(data.projects ?? [])
-          );
+        if (loadResponse.ok) {
+          const loadedData = await loadResponse.json();
+          localStorage.setItem("loaded_tasks", JSON.stringify(loadedData.tasks ?? []));
+          localStorage.setItem("loaded_projects", JSON.stringify(loadedData.projects ?? []));
+          console.log("Loaded data:", loadedData);
         } else {
-          console.error("Load failed:", await response.text());
+          console.error("Load failed:", await loadResponse.text());
         }
+
+        navigate("/Dashboard");
       } catch (err) {
-        console.error("Error during load:", err);
+        console.error("Error during token exchange or data load:", err);
+        navigate("/");
       }
     };
 
-    const run = async () => {
-      if (idToken) {
-        await loadData();
-      }
-      navigate("/Dashboard");
-    };
-
-    run();
+    exchangeCodeForTokens();
   }, [navigate]);
 
   return null;

@@ -68,14 +68,11 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
       {
         userPool: this.userPool,
         generateSecret: false,
-        authFlows: {
-          userSrp: true,
-        },
         oAuth: {
-          callbackUrls: ["http://localhost:3000/callback"],
-          logoutUrls: ["http://localhost:3000/logout"], //noch nicht in use
+          callbackUrls: ["https://planungs-tool.btc-ag.cloud/callback"],
+          logoutUrls: ["https://planungs-tool.btc-ag.cloud/logout"],
           flows: {
-            implicitCodeGrant: true,
+            authorizationCodeGrant: true,
           },
           scopes: [cognito.OAuthScope.OPENID],
         },
@@ -127,7 +124,7 @@ export class PlanungsAssistenzTool2Stack extends cdk.Stack {
     edit.addMethod("POST", new apigw.LambdaIntegration(editLambda), {
       authorizer,
       authorizationType: apigw.AuthorizationType.COGNITO,
-    })
+    });
 
     // CloudFormation Outputs
     new cdk.CfnOutput(this, "ApiUrl", {

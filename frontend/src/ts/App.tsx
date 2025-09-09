@@ -27,7 +27,6 @@ import NavBar from "../components/NavBar.tsx";
 import Dashboard from "../components/Dashboard.tsx";
 import AddTask from "../components/AddTask.tsx";
 import AddProject from "../components/AddProject.tsx";
-import ProjectView from "../components/ProjectView.tsx";
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);

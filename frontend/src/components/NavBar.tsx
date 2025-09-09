@@ -52,7 +52,7 @@ const NavBar: React.FC<NavBarProps> = ({
             href={
               "https://ni-beh-app-login.auth.eu-central-1.amazoncognito.com/login?response_type=token&client_id=" +
               config.USERPOOLCLIENTID +
-              "&redirect_uri=http://localhost:3000/callback"
+              "&redirect_uri=https://planungs-tool.btc-ag.cloud/callback"
             }
           >
             Login
